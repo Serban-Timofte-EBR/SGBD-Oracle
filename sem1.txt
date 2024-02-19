@@ -1,0 +1,36 @@
+Lab Exam: Week 12
+Project: Week 14 
+
+Extensia PL - stabileste cum se vor face prelucrarile, care este fluxul, etc
+Blocuri PL = Comenzi SQL + comenzi procedurale
+
+Blocuri:
+    - Anonim = nu este salvat sub un nume SI nu este stocat
+            - primesc rezultatul si dupa nu mai exista
+            - EX: select
+
+    - Stocate = Proceduri, functii Pachete de Subprograme, Declansatori
+            - blocuri anonime salvate
+            - EX: view = select salvat in DB
+
+Bloc PL/SQL:
+    - DECLARE:
+        - optionala
+        - variabile
+
+    - BEGIN
+                        - SECTIUNE EXECUTABILA - obligatorie
+    - END
+
+    - EXEPRION:
+        - optional
+        - se introduce intre BEGIN si END
+
+Cel mai simplu bloc SQL:
+    BEGIN
+        NULL
+    END;
+
+- Operator de atribuire:  :=
+- In PL nu sunt acceptate functiile de grup (SUM, MIN, MAX, AVG, COUNT, STDDEV) si functia DECODE
+- EXECUTE IMMEDIATE - pentru a realiza anumite comenzi sql in PL ( EX: ALTER TABLE )
