@@ -1,3 +1,4 @@
+set serveroutput on -- once per session
 VAR b NUMBER;
 
 DECLARE
