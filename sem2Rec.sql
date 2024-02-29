@@ -56,3 +56,22 @@ END;
 SELECT * 
 FROM angajati
 WHERE id_angajat = :b;
+
+-- Bloc 2
+-- nume, venit, vechime de la angajatul citit de la tastatura
+ACCEPT id PROMPT 'ID Angajat: '
+
+DECLARE 
+    v_nume angajati.nume%TYPE;
+    v_venit NUMBER;
+    v_vechime NUMBER;
+    v_id angajati.id_angajat%TYPE := &id;
+BEGIN 
+    SELECT nume, salariul + salariul * NVL(comision, 0 ), ROUND((sysdate - data_angajare) / 365, 2)
+    INTO v_nume, v_venit, v_vechime
+    FROM angajati
+    WHERE id_angajat = v_id;
+    
+    dbms_output.put_line(v_nume || ' are venitul ' || v_venit || ' si vechimea de aproximativ ' || v_vechime || ' ani');
+END;
+
