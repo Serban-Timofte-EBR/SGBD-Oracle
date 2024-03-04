@@ -38,4 +38,5 @@ Regulile lui Codd:
 
         !!! Cele mai importante: 1,2,3,4,5
 
-    - 
+    - Structuri de control: 
+        IF, ELSE, CASE, WHILE, FOR, DO WHILE 
