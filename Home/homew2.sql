@@ -20,7 +20,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Soluțiile ecuației sunt: ' || x1 || ' și ' || x2);
     ELSIF delta = 0 THEN
         x1 := -b / (2*a);
-        DBMS_OUTPUT.PUT_LINE('Ecuația are o soluție dublă: ' || x1);
+        DBMS_OUTPUT.PUT_LINE('Ecuația are o soluția: ' || x1);
     ELSE
         DBMS_OUTPUT.PUT_LINE('Ecuația nu are soluții reale.');
     END IF;
