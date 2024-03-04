@@ -1,0 +1,41 @@
+SGBD asigura legatura intre intefata si baza de date
+Functiile SGBD:
+    - Definire
+    - Administrare
+    - Manipulare
+    - Utilizare
+
+Regulile lui Codd:
+    - a pus bazele algebrei relationare 
+    - regulile de normalizare 
+    - A definit regulile ca un SGBD sa fie relationar:
+        0. Foloseste exclusiv functiile relationare
+        1. Toate informatiile dintr-o db relationara trebuie stocate ca valori in tabele
+        2. Orice valoare stocada in DB poate fi accesibila cand cunaostem tabela, PK, numele coloanei pe care o cautam
+        3. Valoarea NULL
+            - Operatiile cu NULL dau NULL
+            - Functiile de grup ignora valorile NULL
+            - NULL nu se foloseste cu = (folosim is NULL)
+                CREATE OR REPLACE VIEW v1 AS
+                SELECT NULL AS c_null FROM DUAL
+                - tabela cu o coloana si o linie cu NULL
+                - coloana are tipul VARCHAR2
+                - TREBUIE SA SE OFERE O MODALITATE CONSISTENTA PENTRU REPREZENTAREA SI TRATAREA VALORILOR NULL
+        4. Stocarea metadatelor
+        5. Limbaje utilizate (beneficiaza de LMD si LDD)
+        6. Sa se permita ca tabelele virtuale sa fie si efectiv actualizabile
+            - adica sa fie selecturi simple, fara functii de grup, expresii, grupari, jonctiuni
+            - view nu este o tabela => un update se face pe tabela de baza
+            - pe un view care foloseste functii nu poate face update
+            - Exist o tabela de metadate: ALL_UPDATABLE_COLUMNS (OWNER = USER pentru tabelele mele AND TABLE_NAME = 'numetabela')
+            - Update pe un view care are un join se poate face pe tabela care pastreaza cheia primara ( angajati cu comenzi, id_comanda este PK, deci doar atributele ce tin de id_comanda se pot modifica)
+        7.
+        8. Independenta fizica si dispobinibiliatea datelor fata de aplicatii 
+        9. 
+        10. Restrictii de integritate
+        11. Distribuirea geografia a datelor
+        12. Daca are un limbaj scazute, nu le folosim pentru a evita restrictiile de integritate
+
+        !!! Cele mai importante: 1,2,3,4,5
+
+    - 
