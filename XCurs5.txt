@@ -1,0 +1,45 @@
+TRATAREA EXCEPTIILOR
+    - Exceptii:
+        - Implicite -> Server Oracle            -- Erori cel mai des
+        - Explicite -> Definite de user
+    - Tratam erorile de executie (run time) in zona exceptiilor
+    - Putem face bloc PL SQL in bloc PL SQL 
+        DECLARE
+        BEGIN
+            BEGIN
+                SELECT ...
+            END
+            BEGIN
+                SELECT ...
+            END
+        END
+    - PRAGMA EXEPTION_INIT(nume exceptie, codul de eroare) 
+    - DELETE pentru un departament care nu exista => stergera nu se produce, dar blocul se executa (test prin cursorul inplicit %ROWCOUNT)
+        - Un bloc de delete va genera eroare pentru un FK (sterg un departament cu angajati)
+    - The SQL%FOUND attribute has a Boolean value that returns TRUE if at least one row was 
+    affected by an INSERT, UPDATE, or DELETE statement, or if a SELECT INTO statement retrieved 
+    one row
+    - EXCEPTION 
+        WHEN OTHER THEN
+            SQLERRM => Returneaza mesajul asociat erorii 
+    - SQL CODE returneaza codul de eroare
+    
+    - Exceptie definita de utilizator 
+        - RAISE exeption 
+
+    DECLARE
+        invalid_prod EXCEPTION
+    BEGIN
+        UPDATE produse
+        SET denumire_produse = "nou"
+        WHERE id_produs = 1726; => nu produce erori ca nu modific cheie primara
+        IF SQL%NOTFOUND THEN
+            RAISE invalid_prod
+        END IF;
+    EXCEPTION
+        WHEN invalid_prod THEN  dbms ....
+        WHEN OTHERS THEN dbms ...
+    END;
+
+    - SQLCODE si SQLRRM nu pot fi incluse in blocuri de insert sau alte comenzi SQL => eroare de compilare
+        - Daca stocam in variabile si facem insert merge
