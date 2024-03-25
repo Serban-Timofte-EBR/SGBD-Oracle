@@ -1,0 +1,29 @@
+TIPURI DE DATE COMPUSE:
+    - RECORD
+    - COLECTII
+
+    - RECORD:
+        - definim tipurile de data
+        TYPE TipRecordProd IS RECORD
+        id_prod NUMBER
+        den_prod VARCHAR2
+
+        Var2_rec var_rec%TYPE -> preluam tipul record
+
+        - permite initializari
+
+    - COLECTII:
+        - echivalentul vectorilor
+        - colectiile fac parte PGA, zonei de memorie alocata mie, particular
+        - vectorii sunt tipuri de date dense, se poate sterge doar de la final
+    
+    - BULK_Collect -> trimite one time interogarea noastr
+    SELECT * BUL COLLECT INTO v_ang FROM angajat
+    WHERE id_angajat in between 100 and 120              -- constituie selectul cu toate inregistrarile si apoi incarcate in variabila    
+
+    - Daca intre 100 si 120 nu avem valori consecutive, se vor incarca doar cele care exista
+    - BULK_ROWCOUNT -> numarul de modificari efectuate de update, pe fiecare element in parte 
+
+    - NESTED TABLE
+        - Pot fi stocate in baza de date
+        - Trebuie extinsa structura pentru a putea adauga elemente    
