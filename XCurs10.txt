@@ -1,0 +1,5 @@
+DECLANSATORI: 
+    - Obiect al bazei de date care se declanseaza automat ( in general la actualizarea datelor )
+    - Poate fi asociat unei tabele de baza sau virtuale (in ultimul caz ce se intampla instead of)
+
+    -- Error Handling for Mutating Table

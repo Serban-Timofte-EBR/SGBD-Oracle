@@ -153,3 +153,24 @@ END;
 BEGIN
     vechime_angajati;
 END;
+
+-- sa se creeze o procedura prin care sa se afise topul primilor n clienti afis nume
+-- afisati desc in functie de valoare comenzilor proprii si procentul detinut de acestia 
+-- din val totala n
+
+CREATE OR REPLACE PROCEDURE top_clienti(n IN NUMBER)
+IS 
+    TYPE rec is RECORD
+    (
+        id_client NUMBER,
+        val_com NUMBER,
+    );
+    CURSOR c IS (SELECT c.id_comanda, SUM(rc.pret*rc.cantitate) as val
+                FROM comenzi c, rand_comenzi rc
+                WHERE c.id_comanda = rc.id_comanda
+                AND c.id_client IN (SELECT id_client FROM angajati)
+                GROUP BY c.id_comanda)
+BEGIN
+    OPEN c
+END;
+            
