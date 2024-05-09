@@ -541,3 +541,143 @@ WHERE
 /
 
 execute ADD_JOB_HIST(106, 20);
+
+
+-- Sa se creeze un trigger, trg_pk_produs, asupra tabelei Produse, care sa adauge in campul cheie primara 
+-- valoarea maxima existenta incrementata
+
+CREATE OR REPLACE TRIGGER trg_pk_produs
+BEFORE INSERT ON produse
+FOR EACH ROW
+DECLARE 
+    new_id INT;
+BEGIN
+    SELECT MAX(id_produs) + 1 
+    INTO new_id
+    FROM produse;
+    
+    :NEW.id_produs := new_id;
+END;
+/
+
+BEGIN
+    INSERT INTO produse(denumire_produs, descriere, categorie, pret_lista, pret_min, stoc) 
+    VALUES ('Nume Produs', 'Descriere Produs', 'Categorie Produs', 100, 90, 50);
+END;
+
+-- Sa se creeze un trigger, trg_update_prod_cascada, asupra tabelei Produse, prin care, 
+-- la modificarea valorii id_produs din tabela parinte, aceasta sa se modifice automat si in 
+-- inregistrarile corespondente din tabela copil
+
+CREATE OR REPLACE TRIGGER trg_update_prod_cascada
+AFTER UPDATE OF id_produs ON produse
+FOR EACH ROW
+BEGIN
+    UPDATE rand_comenzi
+    SET id_produs = :NEW.id_produs
+    WHERE id_produs = :OLD.id_produs;
+END;
+/
+
+BEGIN 
+    UPDATE produse
+    SET id_produs = 4000
+    WHERE id_produs = 3106;
+    --comanda 2380
+END;
+
+--Sa se creeze un declanşator, trg_stop_marire, care să împiedice mărirea salariului pentru 
+-- angajații cu vechimea mai mare de 10 de ani
+
+CREATE OR REPLACE TRIGGER trg_stop_marire
+BEFORE UPDATE OF salariul ON angajati
+FOR EACH ROW
+WHEN (:OLD.data_angajare < ADD_MONTHS(SYSDATE, -120))
+BEGIN
+    IF :NEW.salariul > :OLD.salariul THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Nu se poate creste salariul angajatilor cu o vechime mai mare de 10 ani');
+    END IF;
+END;
+/
+
+BEGIN
+    UPDATE angajati
+    SET salariul = salariul + 1000
+    WHERE id_angajat = 100;
+END;
+
+---Să se adauge în tabela Produse coloana Stoc. Să se introducă valoarea 2000 în coloana nou adăugată.
+---Să se creeze un trigger, trg_verifica_stoc, care să nu permită comandarea unui produs în cantitate 
+    -- mai mare decât stocul aferent.
+---Totodată, pentru produsele comandate, prin trigger se va diminua stocul cu valoarea comandată.
+
+CREATE OR REPLACE TRIGGER trg_verifica_stoc
+BEFORE INSERT OR UPDATE OF cantitatea on rand_comenzi
+FOR EACH ROW
+DECLARE 
+    v_stoc_disponibil NUMBER;
+BEGIN
+    SELECT stoc INTO v_stoc_disponibil
+    FROM produse
+    WHERE id_produs = :NEW.id_produs;
+    
+    IF :NEW.cantitatea > v_stoc_disponibil THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Cantitatea comandata este mai mare decat stocul disponibil.');
+    ELSE
+        IF INSERTING THEN
+            UPDATE produse 
+            SET stoc = stoc - :NEW.cantitatea
+            WHERE id_produs = :NEW.id_produs;
+        ELSIF UPDATING THEN
+            UPDATE produse
+            SET stoc = stoc + :OLD.cantitate - :NEW.cantitate
+            WHERE id_produs = :NEW.id_produs;
+        END IF;
+    END IF;
+END;
+/
+
+BEGIN
+    INSERT INTO comenzi
+    VALUES(1000, SYSDATE, 'online', 931, 4, 100);
+
+    INSERT INTO rand_comenzi
+    VALUES (1000, 3520, 44, 49);
+END;
+
+--Sa se creeze un declansator, trg_actualizeaza_istoric, prin care:
+-- in momentul modificarii functiei unui angajat, se va adauga automat o noua inregistrare in tabela istoric_functii, astfel:
+  ---daca angajatul nu si-a mai schimbat functia niciodata: data de inceput in functia schimbata va fi data angajarii, iar cea de sfarsit data curenta
+  ---daca angajatul si-a mai schimbat functia: data de inceput pentru functia schimbata va fi ultima data de sfarsit pe o functie detinuta de angajatul in cauza
+-- in momentul stergerii unui angajat, se vor sterge automat toate referirile la angajatul respectiv din tabela istoric_functii
+
+CREATE OR REPLACE TRIGGER trg_actualizeaza_istoric
+AFTER DELETE OR UPDATE ON angajati
+FOR EACH ROW
+DECLARE
+    v_ultimul_sf DATE;
+BEGIN
+    IF UPDATING('ID_FUNCTIE') THEN
+        SELECT MAX(data_sfarsit) INTO v_ultimul_sf
+        FROM istoric_functii
+        WHERE id_angajat = :OLD.id_angajat;
+        
+        IF v_ultimul_sf IS NULL THEN
+            v_ultimul_sf := :OLD.data_angajare;
+        END IF;
+        
+        INSERT INTO ISTORIC_FUNCTII
+        VALUES (:OLD.id_angajat, v_ultimul_sf, SYSDATE, :OLD.id_functie, :OLD.id_departament);
+    ELSIF DELETING THEN
+        DELETE FROM ISTORIC_FUNCTII WHERE ID_ANGAJAT = :OLD.ID_ANGAJAT;
+    END IF;
+END;
+/
+
+UPDATE ANGAJATI
+SET ID_FUNCTIE = 'IT_PROG'
+WHERE ID_ANGAJAT = 101;
+
+SELECT * FROM ISTORIC_FUNCTII WHERE ID_ANGAJAT = 101;
+
+DELETE FROM ANGAJATI WHERE ID_ANGAJAT = 110;
