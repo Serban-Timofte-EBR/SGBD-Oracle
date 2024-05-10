@@ -19,10 +19,27 @@
 CREATE OR REPLACE PACKAGE recapitulare_test AS
     PROCEDURE afiseaza_angajat (id IN angajati.id_angajat%TYPE);
     FUNCTION val_comenzi_angajat (id IN angajati.id_angajat%TYPE) RETURN NUMBER;
+    PROCEDURE vechime_angajat (id IN angajati.id_angajat%TYPE, v_vechime OUT NUMBER);
 END recapitulare_test;
 /
 
 CREATE OR REPLACE PACKAGE BODY recapitulare_test AS
+    FUNCTION check_id_ang(id IN angajati.id_angajat%TYPE)
+    RETURN BOOLEAN
+    IS
+        v_counter NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_counter
+        FROM angajati
+        WHERE id_angajat = id;
+        
+        IF v_counter > 0 THEN
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END check_id_ang;
+
     PROCEDURE afiseaza_angajat (id IN angajati.id_angajat%TYPE) 
     IS
         v_counter NUMBER;
@@ -81,11 +98,34 @@ CREATE OR REPLACE PACKAGE BODY recapitulare_test AS
         WHEN e_ang_404 THEN
             DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu ID: ' || id);
     END val_comenzi_angajat;
+    
+    PROCEDURE vechime_angajat (id IN angajati.id_angajat%TYPE, v_vechime OUT NUMBER)
+    IS
+        v_flag BOOLEAN;
+        
+        e_ang_404 EXCEPTION;
+    BEGIN
+        v_flag := check_id_ang(id);
+        
+        IF NOT v_flag THEN
+            RAISE e_ang_404;
+        END IF;
+        
+        SELECT ROUND((SYSDATE - data_angajare) / 365, 2) INTO v_vechime
+        FROM angajati
+        WHERE id_angajat = id;
+        
+    EXCEPTION
+        WHEN e_ang_404 THEN
+            DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu ID: ' || id);
+    END;
 END recapitulare_test;
 /
 
 DECLARE
     v_val_com_145 NUMBER;
+    
+    v_vechime NUMBER;
 BEGIN
     recapitulare_test.afiseaza_angajat(1);
     recapitulare_test.afiseaza_angajat(145);
@@ -94,4 +134,10 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Valoarea comenzilor angajatului 100: ' || v_val_com_145);
     v_val_com_145 := recapitulare_test.val_comenzi_angajat(145);
     DBMS_OUTPUT.PUT_LINE('Valoarea comenzilor angajatului 145: ' || v_val_com_145);
+    
+    recapitulare_test.vechime_angajat(100, v_vechime);
+    DBMS_OUTPUT.PUT_LINE('Vechimea angajatului 100: ' || v_vechime);
+    recapitulare_test.vechime_angajat(145, v_vechime);
+    DBMS_OUTPUT.PUT_LINE('Vechimea angajatului 145: ' || v_vechime);
+    recapitulare_test.vechime_angajat(1, v_vechime);
 END;
