@@ -20,6 +20,7 @@ CREATE OR REPLACE PACKAGE recapitulare_test AS
     PROCEDURE afiseaza_angajat (id IN angajati.id_angajat%TYPE);
     FUNCTION val_comenzi_angajat (id IN angajati.id_angajat%TYPE) RETURN NUMBER;
     PROCEDURE vechime_angajat (id IN angajati.id_angajat%TYPE, v_vechime OUT NUMBER);
+    PROCEDURE mareste_salariu (i_email IN angajati.email%TYPE);
 END recapitulare_test;
 /
 
@@ -39,6 +40,22 @@ CREATE OR REPLACE PACKAGE BODY recapitulare_test AS
             RETURN FALSE;
         END IF;
     END check_id_ang;
+
+    FUNCTION check_email_ang(i_email IN angajati.email%TYPE)
+    RETURN BOOLEAN
+    IS
+        v_counter NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_counter 
+        FROM angajati
+        WHERE email = i_email;
+
+        IF v_counter > 0 THEN
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END check_email_ang;
 
     PROCEDURE afiseaza_angajat (id IN angajati.id_angajat%TYPE) 
     IS
@@ -118,7 +135,29 @@ CREATE OR REPLACE PACKAGE BODY recapitulare_test AS
     EXCEPTION
         WHEN e_ang_404 THEN
             DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu ID: ' || id);
-    END;
+    END vechime_angajat;
+
+    PROCEDURE mareste_salariu (i_email IN angajati.email%TYPE)
+    IS
+        v_flag BOOLEAN;
+
+        e_ang_404 EXCEPTION;
+    BEGIN
+        v_flag := check_email_ang(i_email);
+
+        IF v_flag THEN
+            UPDATE angajati
+            SET salariul = salariul + 100
+            WHERE email = i_email;
+
+            DBMS_OUTPUT.PUT_LINE('Salariul angajatului cu emailul ' || i_email || ' a fost marit cu 100');
+        ELSE
+            RAISE e_ang_404;
+        END IF;
+    EXCEPTION
+        WHEN e_ang_404 THEN
+            DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu emailul: ' || i_email);
+    END mareste_salariu;
 END recapitulare_test;
 /
 
@@ -140,4 +179,9 @@ BEGIN
     recapitulare_test.vechime_angajat(145, v_vechime);
     DBMS_OUTPUT.PUT_LINE('Vechimea angajatului 145: ' || v_vechime);
     recapitulare_test.vechime_angajat(1, v_vechime);
+
+    recapitulare_test.mareste_salariu('test@test.com');
+    -- recapitulare_test.mareste_salariu('');
 END;
+
+SELECT * FROM angajati;
