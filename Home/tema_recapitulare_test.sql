@@ -16,11 +16,14 @@
 
 --În toate subprogramele de mai sus, să se verifice situația în care angajatul indicat nu există (invocând o excepție în acest caz).
 
+SET SERVEROUTPUT ON;
+
 CREATE OR REPLACE PACKAGE recapitulare_test AS
     PROCEDURE afiseaza_angajat (id IN angajati.id_angajat%TYPE);
     FUNCTION val_comenzi_angajat (id IN angajati.id_angajat%TYPE) RETURN NUMBER;
     PROCEDURE vechime_angajat (id IN angajati.id_angajat%TYPE, v_vechime OUT NUMBER);
     PROCEDURE mareste_salariu (i_email IN angajati.email%TYPE);
+    PROCEDURE mareste_salariu2 (id IN angajati.id_angajat%TYPE);
 END recapitulare_test;
 /
 
@@ -158,6 +161,38 @@ CREATE OR REPLACE PACKAGE BODY recapitulare_test AS
         WHEN e_ang_404 THEN
             DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu emailul: ' || i_email);
     END mareste_salariu;
+    
+    PROCEDURE mareste_salariu2 (id IN angajati.id_angajat%TYPE)
+    IS
+        v_flag BOOLEAN;
+        v_val NUMBER;
+        v_crestere NUMBER;
+        
+        e_ang_404 EXCEPTION;
+    BEGIN
+        v_flag := check_id_ang(id);
+        
+        IF NOT v_flag THEN
+            RAISE e_ang_404;
+        END IF;
+        
+        v_val := val_comenzi_angajat(id);
+        
+        IF v_val < 1000 THEN
+            v_crestere := 11;
+        ELSE
+            v_crestere := 18;
+        END IF;
+        
+        UPDATE angajati
+        SET salariul = salariul + v_crestere
+        WHERE id_angajat = id;
+        
+        DBMS_OUTPUT.PUT_LINE('Angajatul cu ID ' || id || ' are o crestere salariala de ' || v_crestere);
+    EXCEPTION
+        WHEN e_ang_404 THEN
+            DBMS_OUTPUT.PUT_LINE('Nu exista un angajat cu ID: ' || id);
+    END mareste_salariu2;
 END recapitulare_test;
 /
 
@@ -182,6 +217,6 @@ BEGIN
 
     recapitulare_test.mareste_salariu('test@test.com');
     -- recapitulare_test.mareste_salariu('');
+    
+    recapitulare_test.mareste_salariu2(145);
 END;
-
-SELECT * FROM angajati;
