@@ -1,0 +1,58 @@
+Protectia bazelor de date:
+    - Securitatea datelor
+    - Integritatea datelor
+
+1. Securitate:
+    1. Drepturile autorilor
+    2. Tabele virtuale
+    3. Criptarea datelor 
+
+2. Integritatea:
+    1. Restrictiile de Integritate
+
+A. Autorizarea accesului utilizatorilor
+    - Oferirea de drepturi utilizatorilor pentru a accesa/modifica baza de date
+    - Se foloseste grant pentru asignarea si crearea rolului
+
+B. Integritatea datelor
+    - Restrictiile de integritate
+    - Restrictiile explicite => triggeri 
+
+Tranzactii = comenzi de actualizare a datelor
+
+Caracteristicile unei tranzactii - ACID;
+    - ATOMICA 
+        - se executa in totalitate sau deloc
+            - tranzactia de termina la commit sau la rollback 
+            - create, alter, drop, grant, revoke fac commit automat 
+    - CONSISTENTA 
+        - datele trebuie sa ramana consistente dupa tranzactie
+    - IZOLARE
+        - executia tranzactiilor independete unele de altele 
+    - DURABILITATE
+        - actualizarea este persistenta
+
+C. Backup-ul bazei de date 
+
+FLASHBACK:
+    - Recuperarea unei tabele 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL DYNAMICS:
+    - Ce comenzi rulam in cadrul blocului PL/SQL? DML - INSERT, UPDATE, DELETE, SELECT, COMMIT,  ROLLBACK, SAVEPOINT
+    - Ce comenzi nu putem rula in cadrul PL/SQL? LDD - CREATE, ALTER, DROP
+        - Acestea se pot executa cu execute immediate 
+    
+    **Optimizare: transformari relationale: 
+    !!! SELECTIA, PROIECTIA - operatori relationari
+        - mai intai se executa: SELECTIA ( mai intai iau randurile care ma intereseaza si dupa ma uit sa vad ce vreau de acolo)
+        - SELECTIA: Preluarea unui subset de inregistrati ( diminuearea de randuri ) - WHERE
+        - PROIECTIA: Prealuarea unui numar de coloane - SELECT
+        - JONCTIUNEA: ramane la urma 
+
+    METODA 1:
+    BEGIN
+        EXECUTE IMMEDIATE '--instructiuni'
+    END; 
