@@ -113,3 +113,32 @@ BEGIN
         dbms_output.put_line('Salariul total: ' || suma);
     END LOOP;
 END;
+
+-- Construiți un bloc PL/SQL prin care să se afișeze primele 3 comenzi care au cele mai multe produse comandate.
+DECLARE
+    CURSOR top3_comenzi IS SELECT com.id_comanda, com.data, COUNT(rc.id_produs) As nrProduse
+                            FROM comenzi com, rand_comenzi rc
+                            WHERE com.id_comanda = rc.id_comanda
+                            GROUP BY com.id_comanda, com.data
+                            ORDER BY nrProduse DESC
+                            FETCH FIRST 3 ROWS ONLY;
+BEGIN
+    FOR cm IN top3_comenzi LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || cm.id_comanda || ' Data: ' || cm.data
+            || ' Numar Produse: ' || cm.nrProduse);
+    END LOOP;
+END;
+
+-- Construiți un bloc PL/SQL prin care să se afișeze, pentru fiecare departament, 
+    -- valoarea totală a salariilor plătite angajaților.
+    
+DECLARE
+    CURSOR salarii_dep IS SELECT id_departament, SUM(salariul) AS salTotal
+                            FROM angajati
+                            GROUP BY id_departament;
+BEGIN
+    FOR info IN salarii_dep LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Departament: ' || NVL(TO_CHAR(info.id_departament), 'Departamentul dubios din DB-ul meu cu id NULL') 
+            || ' - salariul mediu: ' || info.salTotal );
+    END LOOP;
+END;
